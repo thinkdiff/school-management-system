@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  school-management:
+    build: .
+    ports:
+      - "8501:8501"
+    environment:
+      - MONGO_URI=${MONGO_URI}
+      - MONGO_DB_NAME=${MONGO_DB_NAME}
+      - APP_SECRET_KEY=${APP_SECRET_KEY}
+      - APP_ENV=${APP_ENV}
+    volumes:
+      - ./logs:/app/logs
+    depends_on:
+      - mongo
+    restart: unless-stopped
+
+  mongo:
+    image: mongo:7.0
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=password
+      - MONGO_INITDB_DATABASE=school_management
+    volumes:
+      - mongo_data:/data/db
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+    restart: unless-stopped
+
+volumes:
+  mongo_data:
